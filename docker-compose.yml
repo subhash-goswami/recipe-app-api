@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  app:
+    build:   # for built app into current directory so 'context: .'
+      context: .
+    ports:  # host:image
+    - "8000:8000"
+    volumes:  # to get volume in our container so that every changes are automatically done
+    - ./app:/app
+    command: >  # it is for run our container and'>' this is for break the command into next line
+      sh -c "python3 manage.py runserver"
+
