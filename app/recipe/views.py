@@ -44,8 +44,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
+    def _params_to_ints(self, qs):
+        """Convert a list of string IDs to a lists of integers"""
+        return [int(str_id) for str_id in qs.split(',')]
+
     def get_queryset(self):
         """Retrieving the recipes for the authenticated user"""
+        tag = self.request.query_params.get('tags')
+        ingredient = self.request.query_params.get('ingredients')
+        queryset = self.queryset
+        if tag:
+            tag_ids = self._params_to_ints(tag)
+            queryset = queryset.filter(tag__id__in=tag_ids)
+            # double underscore ('__') this django syntax for FK
+        if ingredient:
+            ingredient_ids = self._params_to_ints(ingredient)
+            queryset = queryset.filter(ingredient__id__in=ingredient_ids)
+
         return self.queryset.filter(user=self.request.user)
 
     def get_serializer_class(self):
